@@ -2,11 +2,10 @@ package fr.amgone.animaquizz.server;
 
 import fr.amgone.animaquizz.server.handlers.ClientHandler;
 import fr.amgone.animaquizz.shared.Party;
-import fr.amgone.animaquizz.shared.User;
+import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
-import fr.amgone.animaquizz.shared.packets.UserPartyPresencePacket;
-
+import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,40 +19,41 @@ public class PartiesManager {
         return party;
     }
 
-    public void addUser(ClientHandler clientHandler, String partyID) {
+    public void addPlayer(ClientHandler clientHandler, String partyID) {
         Party party = parties.get(partyID);
         if(party == null) return;
 
-        if(party.addUser(clientHandler.getUser())) {
-            clientHandler.getUser().setCurrentParty(party);
+        if(party.addPlayer(clientHandler.getPlayer())) {
+            Player player = clientHandler.getPlayer();
+            player.setCurrentParty(party);
 
-            Server.writePacket(clientHandler.getUser().getConnection(), // Tell the player who clicked he joined the game
-                    new JoinPartyPacket(clientHandler.getUser().getUsername(), party));
+            Server.writePacket(player.getConnection(), // Tell the player who clicked he joined the game
+                    new JoinPartyPacket(player.getUsername(), party));
 
-            party.getUsers().forEach(users -> {
-                if(!users.equals(clientHandler.getUser())) {
-                    Server.writePacket(users.getConnection(), // Tell everyone in the party that a new player joined
-                            new UserPartyPresencePacket(UserPartyPresencePacket.Action.JOIN, clientHandler.getUser().getUsername()));
+            party.getPlayers().forEach(players -> {
+                if(!players.equals(player)) {
+                    Server.writePacket(players.getConnection(), // Tell everyone in the party that a new player joined
+                            new PlayerPartyPresencePacket(PlayerPartyPresencePacket.Action.JOIN, player.getUsername()));
                 }
             });
         }
     }
 
-    public void removeUserFromParty(User user) {
-        if(user.getCurrentParty() != null) {
-            if(user.getCurrentParty().removeUser(user)) {
-                parties.remove(user.getCurrentParty().getId());
+    public void removePlayerFromParty(Player player) {
+        if(player.getCurrentParty() != null) {
+            if(player.getCurrentParty().removePlayer(player)) {
+                parties.remove(player.getCurrentParty().getId());
 
 
                 ClientHandler.getClients().forEach(clients -> {
-                    if(clients.getUser().getCurrentParty() == null) {
-                        Server.writePacket(clients.getUser().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new Party[0])));
+                    if(clients.getPlayer().getCurrentParty() == null) {
+                        Server.writePacket(clients.getPlayer().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new Party[0])));
                     }
                 });
             }
 
-            user.getCurrentParty().getUsers().forEach(users -> Server.writePacket(users.getConnection(),
-                    new UserPartyPresencePacket(UserPartyPresencePacket.Action.LEAVE, user.getUsername())));
+            player.getCurrentParty().getPlayers().forEach(players -> Server.writePacket(players.getConnection(),
+                    new PlayerPartyPresencePacket(PlayerPartyPresencePacket.Action.LEAVE, player.getUsername())));
         }
     }
 

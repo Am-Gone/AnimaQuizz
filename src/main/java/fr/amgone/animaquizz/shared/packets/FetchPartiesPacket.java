@@ -2,7 +2,6 @@ package fr.amgone.animaquizz.shared.packets;
 
 import fr.amgone.animaquizz.shared.Party;
 import io.netty.buffer.ByteBuf;
-
 import java.nio.charset.StandardCharsets;
 
 public class FetchPartiesPacket extends Packet {
@@ -15,7 +14,6 @@ public class FetchPartiesPacket extends Packet {
     }
 
     public FetchPartiesPacket(ByteBuf byteBuf) {
-        System.out.println("received");
         action = Action.getActionFromID(byteBuf.readInt());
 
         if(action == Action.FETCH) {
@@ -75,9 +73,10 @@ public class FetchPartiesPacket extends Packet {
         private static Action getActionFromID(int action) {
             if(action == 0) {
                 return FETCH;
-            } else if(action == 1){
+            } else if(action == 1) {
                 return RECEIVE;
             }
+
             return null;
         }
     }

@@ -4,16 +4,21 @@ import fr.amgone.animaquizz.app.gui.component.ATextField;
 import fr.amgone.animaquizz.app.network.Client;
 import fr.amgone.animaquizz.shared.Party;
 import org.jdesktop.swingx.JXTextField;
-
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.ArrayList;
 
 public class PartyForm extends JPanel {
-    private final ArrayList<String> users = new ArrayList<>();
-    private final Box usersBox;
+    private final ArrayList<String> players = new ArrayList<>();
+    private final Box playersBox;
 
-    public PartyForm(JFrame jFrame, Client client, Party party) {
+    public PartyForm(Party party) {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         this.setBackground(new Color(63, 124, 172));
 
@@ -52,24 +57,24 @@ public class PartyForm extends JPanel {
 
         this.add(partyBox);
 
-        usersBox = Box.createVerticalBox();
-        this.add(usersBox);
+        playersBox = Box.createVerticalBox();
+        this.add(playersBox);
     }
 
-    public void addUser(String user) {
-        users.add(user);
-        usersBox.removeAll();
+    public void addPlayer(String player) {
+        players.add(player);
+        playersBox.removeAll();
 
-        users.forEach(userIteration -> usersBox.add(new JLabel(userIteration)));
+        players.forEach(playerIteration -> playersBox.add(new JLabel(playerIteration)));
 
         updateUI();
     }
 
-    public void removeUser(String user) {
-        users.remove(user);
-        usersBox.removeAll();
+    public void removePlayer(String player) {
+        players.remove(player);
+        playersBox.removeAll();
 
-        users.forEach(userIteration -> usersBox.add(new JLabel(userIteration)));
+        players.forEach(playerIteration -> playersBox.add(new JLabel(playerIteration)));
 
         updateUI();
     }

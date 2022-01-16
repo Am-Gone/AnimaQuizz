@@ -7,5 +7,5 @@ public interface PacketListener {
 
     void handleJoinParty(JoinPartyPacket joinPartyPacket);
 
-    void handleUserPartyPresence(UserPartyPresencePacket userJoinPartyPacket);
+    void handlePlayerPartyPresence(PlayerPartyPresencePacket playerPartyPresencePacket);
 }

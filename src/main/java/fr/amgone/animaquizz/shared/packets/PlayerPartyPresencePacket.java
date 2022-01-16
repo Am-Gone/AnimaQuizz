@@ -1,19 +1,18 @@
 package fr.amgone.animaquizz.shared.packets;
 
 import io.netty.buffer.ByteBuf;
-
 import java.nio.charset.StandardCharsets;
 
-public class UserPartyPresencePacket extends Packet {
+public class PlayerPartyPresencePacket extends Packet {
     private final Action action;
     private final String username;
 
-    public UserPartyPresencePacket(Action action, String username) {
+    public PlayerPartyPresencePacket(Action action, String username) {
         this.action = action;
         this.username = username;
     }
 
-    public UserPartyPresencePacket(ByteBuf byteBuf) {
+    public PlayerPartyPresencePacket(ByteBuf byteBuf) {
         action = Action.getActionFromID(byteBuf.readInt());
 
         byte[] usernameBytes = new byte[byteBuf.readInt()];
@@ -30,7 +29,7 @@ public class UserPartyPresencePacket extends Packet {
 
     @Override
     public void handle(PacketListener packetListener) {
-        packetListener.handleUserPartyPresence(this);
+        packetListener.handlePlayerPartyPresence(this);
     }
 
     public Action getAction() {

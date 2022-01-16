@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public final class Party {
     private final String id;
     private final String name;
-    private final ArrayList<User> users = new ArrayList<>();
+    private final ArrayList<Player> players = new ArrayList<>();
 
     public Party(String id, String name) {
         this.id = id;
@@ -20,13 +20,13 @@ public final class Party {
         return name;
     }
 
-    public ArrayList<User> getUsers() {
-        return new ArrayList<>(users);
+    public ArrayList<Player> getPlayers() {
+        return new ArrayList<>(players);
     }
 
-    public boolean addUser(User user) {
-        if(users.size() < 10) {
-            users.add(user);
+    public boolean addPlayer(Player player) {
+        if(players.size() < 10) {
+            players.add(player);
             return true;
         } else {
             return false;
@@ -34,12 +34,12 @@ public final class Party {
     }
 
     /**
-     * Removes a user from the party
-     * @param user that needs to be removed
-     * @return true if there are no users left
+     * Removes a player from the party
+     * @param player that needs to be removed
+     * @return true if there are no players left
      */
-    public boolean removeUser(User user) {
-        users.remove(user);
-        return users.size() == 0;
+    public boolean removePlayer(Player player) {
+        players.remove(player);
+        return players.size() == 0;
     }
 }

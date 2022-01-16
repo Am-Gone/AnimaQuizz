@@ -7,7 +7,7 @@ import fr.amgone.animaquizz.shared.packets.CreatePartyPacket;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
 import fr.amgone.animaquizz.shared.packets.PacketListener;
-import fr.amgone.animaquizz.shared.packets.UserPartyPresencePacket;
+import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
 
 public class PacketListenerImpl implements PacketListener {
     private final PartiesManager partiesManager;
@@ -20,30 +20,30 @@ public class PacketListenerImpl implements PacketListener {
 
     @Override
     public void handleFetchParties(FetchPartiesPacket fetchPartiesPacket) {
-        Server.writePacket(clientHandler.getUser().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, partiesManager.getParties().values().toArray(new Party[0])));
+        Server.writePacket(clientHandler.getPlayer().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, partiesManager.getParties().values().toArray(new Party[0])));
     }
 
     @Override
     public void handleCreateParty(CreatePartyPacket createPartyPacket) {
         String partyID = partiesManager.createParty(createPartyPacket.getPartyName()).getId();
-        clientHandler.getUser().setUsername(createPartyPacket.getUsername());
-        partiesManager.addUser(clientHandler, partyID);
+        clientHandler.getPlayer().setUsername(createPartyPacket.getUsername());
+        partiesManager.addPlayer(clientHandler, partyID);
 
         ClientHandler.getClients().forEach(clients -> {
-            if(clients.getUser().getCurrentParty() == null) {
-                Server.writePacket(clients.getUser().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, partiesManager.getParties().values().toArray(new Party[0])));
+            if(clients.getPlayer().getCurrentParty() == null) {
+                Server.writePacket(clients.getPlayer().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, partiesManager.getParties().values().toArray(new Party[0])));
             }
         });
     }
 
     @Override
     public void handleJoinParty(JoinPartyPacket joinPartyPacket) {
-        clientHandler.getUser().setUsername(joinPartyPacket.getUsername());
-        partiesManager.addUser(clientHandler, joinPartyPacket.getParty().getId());
+        clientHandler.getPlayer().setUsername(joinPartyPacket.getUsername());
+        partiesManager.addPlayer(clientHandler, joinPartyPacket.getParty().getId());
     }
 
     @Override
-    public void handleUserPartyPresence(UserPartyPresencePacket userJoinPartyPacket) {
+    public void handlePlayerPartyPresence(PlayerPartyPresencePacket playerPartyPresencePacket) {
         // We do nothing.
     }
 }

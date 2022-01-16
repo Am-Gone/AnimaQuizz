@@ -1,6 +1,5 @@
 package fr.amgone.animaquizz.app.network.handlers;
 
-import fr.amgone.animaquizz.app.gui.AppWindow;
 import fr.amgone.animaquizz.app.network.Client;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.Packet;

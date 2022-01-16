@@ -2,17 +2,17 @@ package fr.amgone.animaquizz.shared;
 
 import io.netty.channel.ChannelHandlerContext;
 
-public class User {
+public class Player {
     private String username;
     private Party currentParty = null;
     private final ChannelHandlerContext connection;
 
-    public User(String username) {
+    public Player(String username) {
         this.connection = null;
         this.username = username;
     }
 
-    public User(ChannelHandlerContext connection) {
+    public Player(ChannelHandlerContext connection) {
         this.connection = connection;
     }
 

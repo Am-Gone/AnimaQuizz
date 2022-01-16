@@ -1,14 +1,13 @@
 package fr.amgone.animaquizz.server.handlers;
 
 import fr.amgone.animaquizz.server.PartiesManager;
-import fr.amgone.animaquizz.shared.User;
+import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.packets.Packet;
 import fr.amgone.animaquizz.shared.packets.PacketListener;
 import fr.amgone.animaquizz.shared.packets.Packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-
 import java.util.ArrayList;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
@@ -18,7 +17,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private ByteBuf byteBuffer;
     private PacketListener packetListener;
-    private User user;
+    private Player player;
 
     public ClientHandler(PartiesManager partiesManager) {
         this.partiesManager = partiesManager;
@@ -27,7 +26,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) {
         CLIENTS.add(this);
-        user = new User(ctx);
+        player = new Player(ctx);
         byteBuffer = ctx.alloc().buffer(4);
         packetListener = new PacketListenerImpl(partiesManager, this);
         System.out.println("Client connected");
@@ -39,7 +38,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         byteBuffer.release();
         byteBuffer = null;
 
-        partiesManager.removeUserFromParty(user);
+        partiesManager.removePlayerFromParty(player);
     }
 
     @Override
@@ -69,8 +68,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    public User getUser() {
-        return user;
+    public Player getPlayer() {
+        return player;
     }
 
     public static ArrayList<ClientHandler> getClients() {
