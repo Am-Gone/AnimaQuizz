@@ -2,6 +2,8 @@ package fr.amgone.animaquizz.server;
 
 import fr.amgone.animaquizz.server.handlers.ClientHandler;
 import fr.amgone.animaquizz.shared.Party;
+import fr.amgone.animaquizz.shared.User;
+import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
 import fr.amgone.animaquizz.shared.packets.UserPartyPresencePacket;
 
@@ -34,6 +36,24 @@ public class PartiesManager {
                             new UserPartyPresencePacket(UserPartyPresencePacket.Action.JOIN, clientHandler.getUser().getUsername()));
                 }
             });
+        }
+    }
+
+    public void removeUserFromParty(User user) {
+        if(user.getCurrentParty() != null) {
+            if(user.getCurrentParty().removeUser(user)) {
+                parties.remove(user.getCurrentParty().getId());
+
+
+                ClientHandler.getClients().forEach(clients -> {
+                    if(clients.getUser().getCurrentParty() == null) {
+                        Server.writePacket(clients.getUser().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new Party[0])));
+                    }
+                });
+            }
+
+            user.getCurrentParty().getUsers().forEach(users -> Server.writePacket(users.getConnection(),
+                    new UserPartyPresencePacket(UserPartyPresencePacket.Action.LEAVE, user.getUsername())));
         }
     }
 

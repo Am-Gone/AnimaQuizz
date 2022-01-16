@@ -33,14 +33,13 @@ public final class Party {
         }
     }
 
-    public void removeUser(User user) {
+    /**
+     * Removes a user from the party
+     * @param user that needs to be removed
+     * @return true if there are no users left
+     */
+    public boolean removeUser(User user) {
         users.remove(user);
-        if(users.size() == 0) {
-            deleteParty();
-        }
-    }
-
-    public void deleteParty() {
-        // TODO
+        return users.size() == 0;
     }
 }

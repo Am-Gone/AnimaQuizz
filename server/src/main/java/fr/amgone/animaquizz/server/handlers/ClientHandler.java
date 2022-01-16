@@ -38,6 +38,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         CLIENTS.remove(this);
         byteBuffer.release();
         byteBuffer = null;
+
+        partiesManager.removeUserFromParty(user);
     }
 
     @Override

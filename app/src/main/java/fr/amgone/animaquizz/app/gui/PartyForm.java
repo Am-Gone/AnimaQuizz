@@ -70,5 +70,7 @@ public class PartyForm extends JPanel {
         usersBox.removeAll();
 
         users.forEach(userIteration -> usersBox.add(new JLabel(userIteration)));
+
+        updateUI();
     }
 }
