@@ -6,4 +6,6 @@ public interface PacketListener {
     void handleCreateParty(CreatePartyPacket createPartyPacket);
 
     void handleJoinParty(JoinPartyPacket joinPartyPacket);
+
+    void handleUserPartyPresence(UserPartyPresencePacket userJoinPartyPacket);
 }

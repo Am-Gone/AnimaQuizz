@@ -7,7 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 public enum Packets {
     FETCH_PARTIES_PACKET(0, FetchPartiesPacket.class),
     CREATE_PARTY_PACKET(1, CreatePartyPacket.class),
-    JOIN_PARTY_PACKET(2, JoinPartyPacket.class);
+    JOIN_PARTY_PACKET(2, JoinPartyPacket.class),
+    USER_JOIN_PARTY_PACKET(3, UserPartyPresencePacket.class);
 
     private final int packetID;
     private final Class<? extends Packet> packet;

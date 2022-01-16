@@ -3,6 +3,8 @@ package fr.amgone.animaquizz.server;
 import fr.amgone.animaquizz.server.handlers.ClientHandler;
 import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
+import fr.amgone.animaquizz.shared.packets.UserPartyPresencePacket;
+
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -17,10 +19,21 @@ public class PartiesManager {
     }
 
     public void addUser(ClientHandler clientHandler, String partyID) {
-        if(parties.get(partyID).addUser(clientHandler.getUser())) {
-            //clientHandler.getUser().setCurrentParty(parties.get(partyID));
-            Server.writePacket(clientHandler.getUser().getConnection(), new JoinPartyPacket(parties.get(partyID)));
-            System.out.println("added to party");
+        Party party = parties.get(partyID);
+        if(party == null) return;
+
+        if(party.addUser(clientHandler.getUser())) {
+            clientHandler.getUser().setCurrentParty(party);
+
+            Server.writePacket(clientHandler.getUser().getConnection(), // Tell the player who clicked he joined the game
+                    new JoinPartyPacket(clientHandler.getUser().getUsername(), party));
+
+            party.getUsers().forEach(users -> {
+                if(!users.equals(clientHandler.getUser())) {
+                    Server.writePacket(users.getConnection(), // Tell everyone in the party that a new player joined
+                            new UserPartyPresencePacket(UserPartyPresencePacket.Action.JOIN, clientHandler.getUser().getUsername()));
+                }
+            });
         }
     }
 

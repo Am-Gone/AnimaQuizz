@@ -18,19 +18,22 @@ import java.awt.Component;
 import java.awt.Dimension;
 
 public class PartiesListForm extends JPanel {
+    private final JFrame jFrame;
     private final Client client;
+    private final ATextField username;
     private final Box box1;
     private final Box box2;
 
     public PartiesListForm(JFrame jFrame, Client client) {
+        this.jFrame = jFrame;
         this.client = client;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBackground(new Color(63, 124, 172));
 
-        ATextField username = new ATextField(20);
-        username.setPreferredSize(new Dimension(jFrame.getWidth() / 2, 32));
-        username.setMaximumSize(new Dimension(jFrame.getWidth() / 2, 32));
-        username.setPrompt("Username");
+        username = new ATextField(20);
+        username.setPreferredSize(new Dimension(300, 32));
+        username.setMaximumSize(new Dimension(300, 32));
+        username.setPrompt("Nom d'utilisateur");
         username.setHorizontalAlignment(JTextField.CENTER);
         this.add(username);
 
@@ -74,7 +77,11 @@ public class PartiesListForm extends JPanel {
             } else if(partyNameField.getText().length() > 24) {
                 JOptionPane.showMessageDialog(jFrame, "Le nom de la partie doit faire 24 charactères maximum.");
             } else {
-                client.sendPacket(new CreatePartyPacket(partyNameField.getText()));
+                if(username.getText().length() == 0) {
+                    JOptionPane.showMessageDialog(jFrame, "Veuillez saisir un nom d'utilisateur.");
+                } else {
+                    client.sendPacket(new CreatePartyPacket(username.getText(), partyNameField.getText()));
+                }
             }
         });
     }
@@ -88,7 +95,13 @@ public class PartiesListForm extends JPanel {
             jButton.setName(newParties[i].getId());
             jButton.setMaximumSize(new Dimension(200, 20));
             jButton.setPreferredSize(new Dimension(200, 20));
-            jButton.addActionListener(actionEvent -> client.sendPacket(new JoinPartyPacket(new Party(jButton.getName(), jButton.getText()))));
+            jButton.addActionListener(actionEvent -> {
+                if(username.getText().length() == 0) {
+                    JOptionPane.showMessageDialog(jFrame, "Veuillez saisir un nom d'utilisateur.");
+                } else {
+                    client.sendPacket(new JoinPartyPacket(username.getText(), new Party(jButton.getName(), jButton.getText())));
+                }
+            });
 
             if(i % 2 == 0) {
                 box1.add(jButton);

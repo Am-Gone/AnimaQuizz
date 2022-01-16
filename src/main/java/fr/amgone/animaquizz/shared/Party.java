@@ -25,11 +25,22 @@ public final class Party {
     }
 
     public boolean addUser(User user) {
-        if(users.size() < 4) {
+        if(users.size() < 10) {
             users.add(user);
             return true;
         } else {
             return false;
         }
+    }
+
+    public void removeUser(User user) {
+        users.remove(user);
+        if(users.size() == 0) {
+            deleteParty();
+        }
+    }
+
+    public void deleteParty() {
+        // TODO
     }
 }

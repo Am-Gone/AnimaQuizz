@@ -7,6 +7,11 @@ public class User {
     private Party currentParty = null;
     private final ChannelHandlerContext connection;
 
+    public User(String username) {
+        this.connection = null;
+        this.username = username;
+    }
+
     public User(ChannelHandlerContext connection) {
         this.connection = connection;
     }
