@@ -4,12 +4,12 @@ import fr.amgone.animaquizz.app.gui.component.ATextField;
 import fr.amgone.animaquizz.shared.Party;
 import org.jdesktop.swingx.JXTextField;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -20,7 +20,7 @@ public class PartyForm extends JPanel {
     private final Box playersBox;
 
     public PartyForm(Party party) {
-        this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        this.setLayout(new BorderLayout());
         this.setBackground(new Color(49, 116, 158));
 
         Box partyBox = Box.createVerticalBox();
@@ -38,7 +38,8 @@ public class PartyForm extends JPanel {
         container.setMaximumSize(new Dimension(800, 570));
         container.setMinimumSize(new Dimension(800, 570));
         container.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        container.setBackground(Color.WHITE);
+        container.setBackground(Color.GRAY);
+        container.setOpaque(true);
 
         JLabel guess = new JLabel("Devine ça");
         guess.setHorizontalAlignment(JLabel.CENTER);
@@ -56,14 +57,14 @@ public class PartyForm extends JPanel {
         answer.setHorizontalAlignment(JXTextField.CENTER);
         partyBox.add(answer);
 
-        this.add(partyBox);
+        this.add(partyBox, BorderLayout.CENTER);
 
         playersBox = Box.createVerticalBox();
-        playersBox.setMaximumSize(new Dimension(20000, 20000));
-        playersBox.setPreferredSize(new Dimension(20000, 20000));
+        playersBox.setMaximumSize(new Dimension(300, 600));
+        playersBox.setPreferredSize(new Dimension(300, 600));
         playersBox.setBackground(new Color(20, 25, 35));
         playersBox.setOpaque(true);
-        this.add(playersBox);
+        this.add(playersBox, BorderLayout.LINE_END);
     }
 
     public void addPlayer(String player) {
