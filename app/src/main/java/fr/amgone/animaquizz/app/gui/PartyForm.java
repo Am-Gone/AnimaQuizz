@@ -1,14 +1,15 @@
 package fr.amgone.animaquizz.app.gui;
 
 import fr.amgone.animaquizz.app.gui.component.ATextField;
-import fr.amgone.animaquizz.app.network.Client;
 import fr.amgone.animaquizz.shared.Party;
 import org.jdesktop.swingx.JXTextField;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -20,7 +21,7 @@ public class PartyForm extends JPanel {
 
     public PartyForm(Party party) {
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        this.setBackground(new Color(63, 124, 172));
+        this.setBackground(new Color(49, 116, 158));
 
         Box partyBox = Box.createVerticalBox();
         JLabel partyName = new JLabel(party.getName());
@@ -58,6 +59,10 @@ public class PartyForm extends JPanel {
         this.add(partyBox);
 
         playersBox = Box.createVerticalBox();
+        playersBox.setMaximumSize(new Dimension(20000, 20000));
+        playersBox.setPreferredSize(new Dimension(20000, 20000));
+        playersBox.setBackground(new Color(20, 25, 35));
+        playersBox.setOpaque(true);
         this.add(playersBox);
     }
 
@@ -65,16 +70,28 @@ public class PartyForm extends JPanel {
         players.add(player);
         playersBox.removeAll();
 
-        players.forEach(playerIteration -> playersBox.add(new JLabel(playerIteration)));
-
-        updateUI();
+        reloadPlayers();
     }
 
     public void removePlayer(String player) {
         players.remove(player);
         playersBox.removeAll();
 
-        players.forEach(playerIteration -> playersBox.add(new JLabel(playerIteration)));
+        reloadPlayers();
+    }
+
+    private void reloadPlayers() {
+        players.forEach(playerIteration -> {
+            JLabel playerName = new JLabel(playerIteration);
+            playerName.setForeground(Color.WHITE);
+            playerName.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
+
+            Border border = playerName.getBorder();
+            Border margin = new EmptyBorder(10, 10, 10, 10);
+
+            playerName.setBorder(new CompoundBorder(border, margin));
+            playersBox.add(playerName);
+        });
 
         updateUI();
     }
