@@ -1,12 +1,12 @@
 package fr.amgone.animaquizz.app.network;
 
+import fr.amgone.animaquizz.shared.handlers.PacketDecoder;
+import fr.amgone.animaquizz.shared.handlers.PacketEncoder;
+import fr.amgone.animaquizz.shared.handlers.PacketFrameEncoder;
 import fr.amgone.animaquizz.app.network.handlers.ServerHandler;
-import fr.amgone.animaquizz.shared.packets.Packet;
 import fr.amgone.animaquizz.shared.packets.PacketListener;
-import fr.amgone.animaquizz.shared.packets.Packets;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -40,7 +40,10 @@ public class Client {
         clientBootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) {
-                socketChannel.pipeline().addLast(new ServerHandler(Client.this, packetListener));
+                socketChannel.pipeline().addLast(new PacketFrameEncoder());
+                socketChannel.pipeline().addLast(new PacketEncoder());
+                socketChannel.pipeline().addLast(new PacketDecoder());
+                socketChannel.pipeline().addLast(new ServerHandler(packetListener));
             }
         });
 
@@ -62,20 +65,7 @@ public class Client {
         }
     }
 
-    public void sendPacket(Packet packet) {
-        ByteBuf byteBuf = Unpooled.buffer();
-        byteBuf.writeInt(Packets.getIDByPacket(packet));
-        packet.write(byteBuf);
-
-        byte[] packetBytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(packetBytes);
-
-        byteBuf.resetReaderIndex();
-        byteBuf.resetWriterIndex();
-
-        byteBuf.writeInt(packetBytes.length);
-        byteBuf.writeBytes(packetBytes);
-
-        serverChannelFuture.channel().writeAndFlush(byteBuf);
+    public Channel getServer() {
+        return serverChannelFuture.channel();
     }
 }

@@ -1,13 +1,11 @@
 package fr.amgone.animaquizz.server;
 
 import fr.amgone.animaquizz.server.handlers.ClientHandler;
-import fr.amgone.animaquizz.shared.packets.Packet;
-import fr.amgone.animaquizz.shared.packets.Packets;
+import fr.amgone.animaquizz.shared.handlers.PacketDecoder;
+import fr.amgone.animaquizz.shared.handlers.PacketEncoder;
+import fr.amgone.animaquizz.shared.handlers.PacketFrameEncoder;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -39,6 +37,9 @@ public class Server {
             serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel socketChannel) {
+                    socketChannel.pipeline().addLast(new PacketFrameEncoder());
+                    socketChannel.pipeline().addLast(new PacketEncoder());
+                    socketChannel.pipeline().addLast(new PacketDecoder());
                     socketChannel.pipeline().addLast(new ClientHandler(partiesManager));
                 }
             });
@@ -60,22 +61,5 @@ public class Server {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void writePacket(ChannelHandlerContext channel, Packet packet) {
-        ByteBuf byteBuf = Unpooled.buffer();
-        byteBuf.writeInt(Packets.getIDByPacket(packet));
-        packet.write(byteBuf);
-
-        byte[] packetBytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(packetBytes);
-
-        byteBuf.resetReaderIndex();
-        byteBuf.resetWriterIndex();
-
-        byteBuf.writeInt(packetBytes.length);
-        byteBuf.writeBytes(packetBytes);
-
-        channel.writeAndFlush(byteBuf);
     }
 }

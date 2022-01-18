@@ -80,7 +80,7 @@ public class PartiesListForm extends JPanel {
                 if(username.getText().length() == 0) {
                     JOptionPane.showMessageDialog(jFrame, "Veuillez saisir un nom d'utilisateur.");
                 } else {
-                    client.sendPacket(new CreatePartyPacket(username.getText(), partyNameField.getText()));
+                    client.getServer().writeAndFlush(new CreatePartyPacket(username.getText(), partyNameField.getText()));
                 }
             }
         });
@@ -99,7 +99,7 @@ public class PartiesListForm extends JPanel {
                 if(username.getText().length() == 0) {
                     JOptionPane.showMessageDialog(jFrame, "Veuillez saisir un nom d'utilisateur.");
                 } else {
-                    client.sendPacket(new JoinPartyPacket(username.getText(), new Party(jButton.getName(), jButton.getText())));
+                    client.getServer().writeAndFlush(new JoinPartyPacket(username.getText(), new Party(jButton.getName(), jButton.getText())));
                 }
             });
 

@@ -19,21 +19,19 @@ public class PartiesManager {
         return party;
     }
 
-    public void addPlayer(ClientHandler clientHandler, String partyID) {
+    public void addPlayer(Player player, String partyID) {
         Party party = parties.get(partyID);
         if(party == null) return;
 
-        if(party.addPlayer(clientHandler.getPlayer())) {
-            Player player = clientHandler.getPlayer();
+        if(party.addPlayer(player)) {
             player.setCurrentParty(party);
 
-            Server.writePacket(player.getConnection(), // Tell the player who clicked he joined the game
-                    new JoinPartyPacket(player.getUsername(), party));
+            player.getConnection().writeAndFlush(new JoinPartyPacket(player.getUsername(), party));
 
             party.getPlayers().forEach(players -> {
                 if(!players.equals(player)) {
-                    Server.writePacket(players.getConnection(), // Tell everyone in the party that a new player joined
-                            new PlayerPartyPresencePacket(PlayerPartyPresencePacket.Action.JOIN, player.getUsername()));
+                    players.getConnection().writeAndFlush(new PlayerPartyPresencePacket(PlayerPartyPresencePacket.Action.JOIN,
+                            player.getUsername())); // Tell everyone in the party that a new player joined
                 }
             });
         }
@@ -47,12 +45,12 @@ public class PartiesManager {
 
                 ClientHandler.getClients().forEach(clients -> {
                     if(clients.getPlayer().getCurrentParty() == null) {
-                        Server.writePacket(clients.getPlayer().getConnection(), new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new Party[0])));
+                        clients.getPlayer().getConnection().writeAndFlush(new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new Party[0])));
                     }
                 });
             }
 
-            player.getCurrentParty().getPlayers().forEach(players -> Server.writePacket(players.getConnection(),
+            player.getCurrentParty().getPlayers().forEach(players -> players.getConnection().writeAndFlush(
                     new PlayerPartyPresencePacket(PlayerPartyPresencePacket.Action.LEAVE, player.getUsername())));
         }
     }
