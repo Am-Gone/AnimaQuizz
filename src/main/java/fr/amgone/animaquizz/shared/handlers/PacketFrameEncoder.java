@@ -20,17 +20,16 @@ public class PacketFrameEncoder extends MessageToByteEncoder<ByteBuf> {
             while (out.readableBytes() > NETTY_MAX_PACKET_SIZE) {
                 splitPacket(NETTY_MAX_PACKET_SIZE, out, channelHandlerContext);
             }
-
-            splitPacket(message.readableBytes(), out, channelHandlerContext);
+            splitPacket(out.readableBytes(), out, channelHandlerContext);
         }
     }
 
     private void splitPacket(int size, ByteBuf message, ChannelHandlerContext channelHandlerContext) {
         byte[] splitPacket = new byte[size];
-        message.writeBytes(splitPacket);
+        message.readBytes(splitPacket);
 
         ByteBuf splitPacketBuf = Unpooled.buffer(size);
-        splitPacketBuf.readBytes(splitPacket);
+        splitPacketBuf.writeBytes(splitPacket);
 
         channelHandlerContext.write(splitPacketBuf);
     }

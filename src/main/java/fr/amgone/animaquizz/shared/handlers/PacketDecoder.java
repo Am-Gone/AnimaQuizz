@@ -35,7 +35,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 list.add(packet);
             } else {
-                progressiveByteBuf.clear();
+                progressiveByteBuf.resetReaderIndex();
             }
         }
     }
