@@ -46,6 +46,6 @@ public enum Packets {
             }
         }
 
-        return -1;
+        return -999;
     }
 }

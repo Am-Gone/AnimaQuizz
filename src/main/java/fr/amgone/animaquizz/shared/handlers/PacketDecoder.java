@@ -20,7 +20,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
         progressiveByteBuf.writeBytes(byteBuf);
 
-        if(progressiveByteBuf.readableBytes() >= 4) {
+        while (progressiveByteBuf.readableBytes() >= 4) {
             int packetSize = progressiveByteBuf.readInt();
             if(progressiveByteBuf.readableBytes() >= packetSize) {
                 ByteBuf packetBuf = channelHandlerContext.alloc().buffer(packetSize);
@@ -28,14 +28,28 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
                 int packetID = packetBuf.readInt();
                 Packet packet = Packets.getPacketByID(packetID, packetBuf);
+                packetBuf.release();
+
                 if(packet == null) {
-                    System.err.println("Received unknown packet with id " + packetID);
+                    if(packetID == -999) {
+                        System.err.println("Received unknown packet with id " + packetID + " (Unregistered packet?)");
+                    } else {
+                        System.err.println("Received unknown packet with id " + packetID);
+                    }
                     return;
                 }
 
                 list.add(packet);
+
+                byte[] leftBytes = new byte[progressiveByteBuf.readableBytes()];
+                progressiveByteBuf.readBytes(leftBytes);
+                progressiveByteBuf.release();
+
+                progressiveByteBuf = channelHandlerContext.alloc().buffer();
+                progressiveByteBuf.writeBytes(leftBytes);
             } else {
                 progressiveByteBuf.resetReaderIndex();
+                break;
             }
         }
     }
