@@ -1,14 +1,20 @@
 package fr.amgone.animaquizz.app.network.handlers;
 
 import fr.amgone.animaquizz.app.gui.AppWindow;
+import fr.amgone.animaquizz.shared.items.ImageItem;
 import fr.amgone.animaquizz.shared.packets.CreatePartyPacket;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
 import fr.amgone.animaquizz.shared.packets.PacketListener;
 import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
+import fr.amgone.animaquizz.shared.packets.items.ImageItemPacket;
+import fr.amgone.animaquizz.shared.packets.items.TextItemPacket;
+import fr.amgone.animaquizz.shared.utils.ImageFrame;
+import java.awt.image.BufferedImage;
 
 public class PacketListenerImpl implements PacketListener {
     private final AppWindow appWindow;
+    private final ImageFrame imageFrame = new ImageFrame();
 
     public PacketListenerImpl(AppWindow appWindow) {
         this.appWindow = appWindow;
@@ -37,6 +43,19 @@ public class PacketListenerImpl implements PacketListener {
             appWindow.addPlayerToParty(playerJoinPartyPacket.getUsername());
         } else {
             appWindow.removePlayerFromParty(playerJoinPartyPacket.getUsername());
+        }
+    }
+
+    @Override
+    public void handleTextItem(TextItemPacket textItemPacket) {
+        appWindow.setItem(textItemPacket.getTextItem());
+    }
+
+    @Override
+    public void handleImageItem(ImageItemPacket imageItemPacket) {
+        if(imageFrame.addFrame(imageItemPacket)) {
+            BufferedImage bufferedImage = imageFrame.getImage();
+            appWindow.setItem(new ImageItem(bufferedImage));
         }
     }
 }

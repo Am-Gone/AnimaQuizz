@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PartiesManager {
-    private final HashMap<String, Party> parties = new HashMap<>();
+    private final HashMap<String, ServerParty> parties = new HashMap<>();
 
     public Party createParty(String name) {
-        Party party = new Party(getRandomID(), name);
+        ServerParty party = new ServerParty(getRandomID(), name);
         parties.put(party.getId(), party);
 
         return party;
@@ -41,7 +41,7 @@ public class PartiesManager {
         if(player.getCurrentParty() != null) {
             if(player.getCurrentParty().removePlayer(player)) {
                 parties.remove(player.getCurrentParty().getId());
-
+                ((ServerParty) player.getCurrentParty()).stopThread();
 
                 ClientHandler.getClients().forEach(clients -> {
                     if(clients.getPlayer().getCurrentParty() == null) {

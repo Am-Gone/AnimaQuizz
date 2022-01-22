@@ -8,6 +8,8 @@ import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
 import fr.amgone.animaquizz.shared.packets.PacketListener;
 import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
+import fr.amgone.animaquizz.shared.packets.items.ImageItemPacket;
+import fr.amgone.animaquizz.shared.packets.items.TextItemPacket;
 
 public class PacketListenerImpl implements PacketListener {
     private final PartiesManager partiesManager;
@@ -44,6 +46,16 @@ public class PacketListenerImpl implements PacketListener {
 
     @Override
     public void handlePlayerPartyPresence(PlayerPartyPresencePacket playerPartyPresencePacket) {
+        // We do nothing.
+    }
+
+    @Override
+    public void handleTextItem(TextItemPacket textItemPacket) {
+        // We do nothing.
+    }
+
+    @Override
+    public void handleImageItem(ImageItemPacket imageItemPacket) {
         // We do nothing.
     }
 }

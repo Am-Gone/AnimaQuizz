@@ -2,7 +2,7 @@ package fr.amgone.animaquizz.shared;
 
 import java.util.ArrayList;
 
-public final class Party {
+public class Party {
     private final String id;
     private final String name;
     private final ArrayList<Player> players = new ArrayList<>();

@@ -3,6 +3,7 @@ package fr.amgone.animaquizz.app.gui;
 import fr.amgone.animaquizz.app.network.Client;
 import fr.amgone.animaquizz.app.network.handlers.PacketListenerImpl;
 import fr.amgone.animaquizz.shared.Party;
+import fr.amgone.animaquizz.shared.items.Item;
 import javax.swing.JFrame;
 import java.awt.Dimension;
 
@@ -45,6 +46,12 @@ public class AppWindow extends JFrame {
     public void removePlayerFromParty(String player) {
         if (partyForm != null) {
             partyForm.removePlayer(player);
+        }
+    }
+
+    public void setItem(Item item) {
+        if (partyForm != null) {
+            partyForm.setItem(item);
         }
     }
 }

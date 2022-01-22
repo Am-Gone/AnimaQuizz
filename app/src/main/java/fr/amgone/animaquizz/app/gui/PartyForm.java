@@ -2,8 +2,12 @@ package fr.amgone.animaquizz.app.gui;
 
 import fr.amgone.animaquizz.app.gui.component.ATextField;
 import fr.amgone.animaquizz.shared.Party;
+import fr.amgone.animaquizz.shared.items.ImageItem;
+import fr.amgone.animaquizz.shared.items.Item;
+import fr.amgone.animaquizz.shared.items.TextItem;
 import org.jdesktop.swingx.JXTextField;
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 public class PartyForm extends JPanel {
     private final ArrayList<String> players = new ArrayList<>();
     private final Box playersBox;
+    private final Box itemBox;
 
     public PartyForm(Party party) {
         this.setLayout(new BorderLayout());
@@ -33,19 +38,19 @@ public class PartyForm extends JPanel {
         partyName.setForeground(Color.BLACK);
         partyBox.add(partyName);
 
-        Box container = Box.createVerticalBox();
-        container.setPreferredSize(new Dimension(800, 570));
-        container.setMaximumSize(new Dimension(800, 570));
-        container.setMinimumSize(new Dimension(800, 570));
-        container.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        container.setBackground(Color.GRAY);
-        container.setOpaque(true);
+        itemBox = Box.createVerticalBox();
+        itemBox.setPreferredSize(new Dimension(800, 570));
+        itemBox.setMaximumSize(new Dimension(800, 570));
+        itemBox.setMinimumSize(new Dimension(800, 570));
+        itemBox.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        itemBox.setBackground(Color.GRAY);
+        itemBox.setOpaque(true);
 
         JLabel guess = new JLabel("Devine ça");
         guess.setHorizontalAlignment(JLabel.CENTER);
         guess.setVerticalAlignment(JLabel.CENTER);
-        container.add(guess);
-        partyBox.add(container);
+        itemBox.add(guess);
+        partyBox.add(itemBox);
 
         ATextField answer = new ATextField(20);
         answer.setPrompt("Écrivez votre réponse");
@@ -93,6 +98,17 @@ public class PartyForm extends JPanel {
             playerName.setBorder(new CompoundBorder(border, margin));
             playersBox.add(playerName);
         });
+
+        updateUI();
+    }
+
+    public void setItem(Item item) {
+        itemBox.removeAll();
+        if(item instanceof TextItem textItem) {
+            itemBox.add(new JLabel(textItem.getText()));
+        } else if(item instanceof ImageItem imageItem) {
+            itemBox.add(new JLabel(new ImageIcon(imageItem.getBufferedImage())));
+        }
 
         updateUI();
     }

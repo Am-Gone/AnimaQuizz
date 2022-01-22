@@ -1,5 +1,7 @@
 package fr.amgone.animaquizz.shared.packets;
 
+import fr.amgone.animaquizz.shared.packets.items.ImageItemPacket;
+import fr.amgone.animaquizz.shared.packets.items.TextItemPacket;
 import io.netty.buffer.ByteBuf;
 import java.lang.reflect.InvocationTargetException;
 
@@ -7,7 +9,9 @@ public enum Packets {
     FETCH_PARTIES_PACKET(0, FetchPartiesPacket.class),
     CREATE_PARTY_PACKET(1, CreatePartyPacket.class),
     JOIN_PARTY_PACKET(2, JoinPartyPacket.class),
-    PLAYER_JOIN_PARTY_PACKET(3, PlayerPartyPresencePacket.class);
+    PLAYER_JOIN_PARTY_PACKET(3, PlayerPartyPresencePacket.class),
+    TEXT_ITEM(4, TextItemPacket.class),
+    IMAGE_ITEM(5, ImageItemPacket.class);
 
     private final int packetID;
     private final Class<? extends Packet> packet;
