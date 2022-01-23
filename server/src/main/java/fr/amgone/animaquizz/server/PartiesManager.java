@@ -4,6 +4,7 @@ import fr.amgone.animaquizz.server.handlers.ClientHandler;
 import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
+import fr.amgone.animaquizz.shared.packets.JoinPartyErrorPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
 import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
 import java.util.HashMap;
@@ -21,7 +22,20 @@ public class PartiesManager {
 
     public void addPlayer(Player player, String partyID) {
         Party party = parties.get(partyID);
-        if(party == null) return;
+        if(party == null) {
+            player.getConnection().writeAndFlush(new JoinPartyErrorPacket(JoinPartyErrorPacket.Errors.PARTY_DOES_NOT_EXISTS));
+            return;
+        }
+
+        if(party.isFull()) {
+            player.getConnection().writeAndFlush(new JoinPartyErrorPacket(JoinPartyErrorPacket.Errors.PARTY_FULL));
+            return;
+        }
+
+        if(party.getPlayerFromUsername(player.getUsername()) != null) {
+            player.getConnection().writeAndFlush(new JoinPartyErrorPacket(JoinPartyErrorPacket.Errors.USERNAME_ALREADY_TAKEN));
+            return;
+        }
 
         if(party.addPlayer(player)) {
             player.setCurrentParty(party);

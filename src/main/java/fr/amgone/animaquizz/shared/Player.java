@@ -24,12 +24,12 @@ public class Player {
         return username;
     }
 
-    public Party getCurrentParty() {
-        return currentParty;
-    }
-
     public void setCurrentParty(Party currentParty) {
         this.currentParty = currentParty;
+    }
+
+    public Party getCurrentParty() {
+        return currentParty;
     }
 
     public ChannelHandlerContext getConnection() {

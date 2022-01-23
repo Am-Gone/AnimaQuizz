@@ -9,9 +9,10 @@ public enum Packets {
     FETCH_PARTIES_PACKET(0, FetchPartiesPacket.class),
     CREATE_PARTY_PACKET(1, CreatePartyPacket.class),
     JOIN_PARTY_PACKET(2, JoinPartyPacket.class),
-    PLAYER_JOIN_PARTY_PACKET(3, PlayerPartyPresencePacket.class),
-    TEXT_ITEM(4, TextItemPacket.class),
-    IMAGE_ITEM(5, ImageItemPacket.class);
+    JOIN_PARTY_ERROR_PACKET(3, JoinPartyErrorPacket.class),
+    PLAYER_PARTY_PRESENCE_PACKET(4, PlayerPartyPresencePacket.class),
+    TEXT_ITEM(5, TextItemPacket.class),
+    IMAGE_ITEM(6, ImageItemPacket.class);
 
     private final int packetID;
     private final Class<? extends Packet> packet;

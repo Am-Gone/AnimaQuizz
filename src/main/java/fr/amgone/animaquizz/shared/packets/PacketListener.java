@@ -10,6 +10,8 @@ public interface PacketListener {
 
     void handleJoinParty(JoinPartyPacket joinPartyPacket);
 
+    void handleJoinPartyError(JoinPartyErrorPacket joinPartyErrorPacket);
+
     void handlePlayerPartyPresence(PlayerPartyPresencePacket playerPartyPresencePacket);
 
     void handleTextItem(TextItemPacket textItemPacket);

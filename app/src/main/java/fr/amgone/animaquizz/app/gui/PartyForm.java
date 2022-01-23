@@ -2,6 +2,7 @@ package fr.amgone.animaquizz.app.gui;
 
 import fr.amgone.animaquizz.app.gui.component.ATextField;
 import fr.amgone.animaquizz.shared.Party;
+import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.items.ImageItem;
 import fr.amgone.animaquizz.shared.items.Item;
 import fr.amgone.animaquizz.shared.items.TextItem;
@@ -17,14 +18,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.ArrayList;
 
 public class PartyForm extends JPanel {
-    private final ArrayList<String> players = new ArrayList<>();
+    private final Party party;
     private final Box playersBox;
     private final Box itemBox;
 
     public PartyForm(Party party) {
+        this.party = party;
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(49, 116, 158));
 
@@ -70,25 +71,27 @@ public class PartyForm extends JPanel {
         playersBox.setBackground(new Color(20, 25, 35));
         playersBox.setOpaque(true);
         this.add(playersBox, BorderLayout.LINE_END);
+
+        reloadPlayers();
     }
 
-    public void addPlayer(String player) {
-        players.add(player);
+    public void addPlayer(Player player) {
+        party.addPlayer(player);
         playersBox.removeAll();
 
         reloadPlayers();
     }
 
-    public void removePlayer(String player) {
-        players.remove(player);
+    public void removePlayer(Player player) {
+        party.removePlayer(player);
         playersBox.removeAll();
 
         reloadPlayers();
     }
 
     private void reloadPlayers() {
-        players.forEach(playerIteration -> {
-            JLabel playerName = new JLabel(playerIteration);
+        party.getPlayers().forEach(players -> {
+            JLabel playerName = new JLabel(players.getUsername());
             playerName.setForeground(Color.WHITE);
             playerName.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
 
