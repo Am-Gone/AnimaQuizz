@@ -1,7 +1,6 @@
 package fr.amgone.animaquizz.shared.items;
 
 import fr.amgone.animaquizz.shared.packets.Packet;
-
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -11,7 +10,7 @@ public abstract class Item {
     public abstract ArrayList<Packet> getPackets();
 
     public static Item getRandomItem() {
-        switch (ThreadLocalRandom.current().nextInt(0, 1)) {
+        switch (ThreadLocalRandom.current().nextInt(0, 2)) {
             case 0 -> {
                 return new TextItem(UUID.randomUUID().toString());
             }

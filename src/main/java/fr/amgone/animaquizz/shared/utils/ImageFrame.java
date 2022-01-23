@@ -31,7 +31,7 @@ public class ImageFrame {
 
     public BufferedImage getImage() {
         ByteArrayInputStream imageBufInputStream = new ByteArrayInputStream(imageBuf);
-
+        imageBuf = null;
         BufferedImage bufferedImage = null;
         try {
             bufferedImage = ImageIO.read(imageBufInputStream);
