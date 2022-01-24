@@ -17,6 +17,11 @@ public class ImageItem extends Item {
     private final BufferedImage bufferedImage;
 
     public ImageItem(BufferedImage bufferedImage) {
+        this("", bufferedImage);
+    }
+
+    public ImageItem(String answer, BufferedImage bufferedImage) {
+        super(answer);
         this.bufferedImage = bufferedImage;
     }
 

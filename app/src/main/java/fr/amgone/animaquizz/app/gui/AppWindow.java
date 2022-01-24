@@ -9,13 +9,14 @@ import javax.swing.JFrame;
 import java.awt.Dimension;
 
 public class AppWindow extends JFrame {
+    private final Client client;
     private final PartiesListForm partiesListForm;
 
     private PartyForm partyForm;
 
     public AppWindow() {
         super("AnimaQuizz");
-        Client client = new Client("localhost", 9001, new PacketListenerImpl(this));
+        client = new Client("localhost", 9001, new PacketListenerImpl(this));
         client.connect();
 
         partiesListForm = new PartiesListForm(this, client);
@@ -32,7 +33,7 @@ public class AppWindow extends JFrame {
     }
 
     public void setParty(Party party) {
-        partyForm = new PartyForm(party);
+        partyForm = new PartyForm(client, party);
         this.setContentPane(partyForm);
         this.getContentPane().revalidate();
         this.getContentPane().repaint();
@@ -53,6 +54,15 @@ public class AppWindow extends JFrame {
     public void setItem(Item item) {
         if (partyForm != null) {
             partyForm.setItem(item);
+        }
+    }
+
+    public void setPoints(Player player, int points) {
+        player.setPoints(points);
+        player.setHasFoundAnswer(true);
+
+        if (partyForm != null) {
+            partyForm.reloadPlayers();
         }
     }
 }

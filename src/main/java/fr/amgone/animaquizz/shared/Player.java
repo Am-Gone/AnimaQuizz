@@ -4,6 +4,9 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class Player {
     private String username;
+    private int points;
+    private boolean hasFoundAnswer = false;
+
     private Party currentParty = null;
     private final ChannelHandlerContext connection;
 
@@ -34,5 +37,21 @@ public class Player {
 
     public ChannelHandlerContext getConnection() {
         return connection;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setHasFoundAnswer(boolean hasFoundAnswer) {
+        this.hasFoundAnswer = hasFoundAnswer;
+    }
+
+    public boolean hasFoundAnswer() {
+        return hasFoundAnswer;
     }
 }

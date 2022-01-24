@@ -4,12 +4,7 @@ import fr.amgone.animaquizz.app.gui.AppWindow;
 import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.items.ImageItem;
-import fr.amgone.animaquizz.shared.packets.CreatePartyPacket;
-import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
-import fr.amgone.animaquizz.shared.packets.JoinPartyErrorPacket;
-import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
-import fr.amgone.animaquizz.shared.packets.PacketListener;
-import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
+import fr.amgone.animaquizz.shared.packets.*;
 import fr.amgone.animaquizz.shared.packets.items.ImageItemPacket;
 import fr.amgone.animaquizz.shared.packets.items.TextItemPacket;
 import fr.amgone.animaquizz.shared.utils.ImageFrame;
@@ -72,5 +67,15 @@ public class PacketListenerImpl implements PacketListener {
             BufferedImage bufferedImage = imageFrame.getImage();
             appWindow.setItem(new ImageItem(bufferedImage));
         }
+    }
+
+    @Override
+    public void handleAnswerPacket(AnswerPacket answerPacket) {
+        // We do nothing.
+    }
+
+    @Override
+    public void handleUpdatePlayerPoints(UpdatePlayerPointsPacket updatePlayerPointsPacket) {
+        appWindow.setPoints(party.getPlayerFromUsername(updatePlayerPointsPacket.getUsername()), updatePlayerPointsPacket.getPoints());
     }
 }

@@ -1,11 +1,13 @@
 package fr.amgone.animaquizz.app.gui;
 
 import fr.amgone.animaquizz.app.gui.component.ATextField;
+import fr.amgone.animaquizz.app.network.Client;
 import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.items.ImageItem;
 import fr.amgone.animaquizz.shared.items.Item;
 import fr.amgone.animaquizz.shared.items.TextItem;
+import fr.amgone.animaquizz.shared.packets.AnswerPacket;
 import org.jdesktop.swingx.JXTextField;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -24,7 +26,7 @@ public class PartyForm extends JPanel {
     private final Box playersBox;
     private final Box itemBox;
 
-    public PartyForm(Party party) {
+    public PartyForm(Client client, Party party) {
         this.party = party;
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(49, 116, 158));
@@ -61,6 +63,13 @@ public class PartyForm extends JPanel {
         answer.setMaximumSize(new Dimension(900, 50));
         answer.setAlignmentX(JXTextField.CENTER_ALIGNMENT);
         answer.setHorizontalAlignment(JXTextField.CENTER);
+
+        answer.addActionListener(actionEvent -> {
+            if(!answer.getText().equals("")) {
+                client.getServer().writeAndFlush(new AnswerPacket(answer.getText()));
+                answer.setText("");
+            }
+        });
         partyBox.add(answer);
 
         this.add(partyBox, BorderLayout.CENTER);
@@ -77,23 +86,21 @@ public class PartyForm extends JPanel {
 
     public void addPlayer(Player player) {
         party.addPlayer(player);
-        playersBox.removeAll();
-
         reloadPlayers();
     }
 
     public void removePlayer(Player player) {
         party.removePlayer(player);
-        playersBox.removeAll();
-
         reloadPlayers();
     }
 
-    private void reloadPlayers() {
+    public void reloadPlayers() {
+        playersBox.removeAll();
+
         party.getPlayers().forEach(players -> {
-            JLabel playerName = new JLabel(players.getUsername());
+            JLabel playerName = new JLabel(players.getUsername() + " (" + players.getPoints() + " points)");
             playerName.setForeground(Color.WHITE);
-            playerName.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
+            playerName.setFont(new Font(Font.SANS_SERIF, players.hasFoundAnswer() ? Font.ITALIC : Font.BOLD, 32));
 
             Border border = playerName.getBorder();
             Border margin = new EmptyBorder(10, 10, 10, 10);
@@ -107,12 +114,13 @@ public class PartyForm extends JPanel {
 
     public void setItem(Item item) {
         itemBox.removeAll();
+        party.getPlayers().forEach(players -> players.setHasFoundAnswer(false));
         if(item instanceof TextItem textItem) {
             itemBox.add(new JLabel(textItem.getText()));
         } else if(item instanceof ImageItem imageItem) {
             itemBox.add(new JLabel(new ImageIcon(imageItem.getBufferedImage())));
         }
 
-        updateUI();
+        reloadPlayers();
     }
 }

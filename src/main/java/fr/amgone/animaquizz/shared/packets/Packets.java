@@ -11,8 +11,10 @@ public enum Packets {
     JOIN_PARTY_PACKET(2, JoinPartyPacket.class),
     JOIN_PARTY_ERROR_PACKET(3, JoinPartyErrorPacket.class),
     PLAYER_PARTY_PRESENCE_PACKET(4, PlayerPartyPresencePacket.class),
-    TEXT_ITEM(5, TextItemPacket.class),
-    IMAGE_ITEM(6, ImageItemPacket.class);
+    TEXT_ITEM_PACKET(5, TextItemPacket.class),
+    IMAGE_ITEM_PACKET(6, ImageItemPacket.class),
+    ANSWER_PACKET(7, AnswerPacket.class),
+    UPDATE_PLAYER_POINTS_PACKET(8, UpdatePlayerPointsPacket.class);
 
     private final int packetID;
     private final Class<? extends Packet> packet;

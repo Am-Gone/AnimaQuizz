@@ -1,14 +1,17 @@
 package fr.amgone.animaquizz.server.handlers;
 
 import fr.amgone.animaquizz.server.PartiesManager;
+import fr.amgone.animaquizz.server.ServerParty;
 import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
+import fr.amgone.animaquizz.shared.packets.AnswerPacket;
 import fr.amgone.animaquizz.shared.packets.CreatePartyPacket;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyErrorPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyPacket;
 import fr.amgone.animaquizz.shared.packets.PacketListener;
 import fr.amgone.animaquizz.shared.packets.PlayerPartyPresencePacket;
+import fr.amgone.animaquizz.shared.packets.UpdatePlayerPointsPacket;
 import fr.amgone.animaquizz.shared.packets.items.ImageItemPacket;
 import fr.amgone.animaquizz.shared.packets.items.TextItemPacket;
 
@@ -62,6 +65,16 @@ public class PacketListenerImpl implements PacketListener {
 
     @Override
     public void handleImageItem(ImageItemPacket imageItemPacket) {
+        // We do nothing.
+    }
+
+    @Override
+    public void handleAnswerPacket(AnswerPacket answerPacket) {
+        ((ServerParty) player.getCurrentParty()).handleAnswer(player, answerPacket.getAnswer());
+    }
+
+    @Override
+    public void handleUpdatePlayerPoints(UpdatePlayerPointsPacket updatePlayerPointsPacket) {
         // We do nothing.
     }
 }

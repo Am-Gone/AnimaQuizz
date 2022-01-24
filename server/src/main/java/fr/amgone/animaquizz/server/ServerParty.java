@@ -4,10 +4,13 @@ import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.items.Item;
 import fr.amgone.animaquizz.shared.packets.Packet;
+import fr.amgone.animaquizz.shared.packets.UpdatePlayerPointsPacket;
 
 public class ServerParty extends Party {
     private boolean hasStopped = false;
     private final Object threadLock = new Object();
+
+    private Item item = null;
 
     public ServerParty(String id, String name) {
         super(id, name);
@@ -32,8 +35,9 @@ public class ServerParty extends Party {
     }
 
     private void runThread() throws InterruptedException {
-        Item item = Item.getRandomItem();
+        item = Item.getRandomItem();
         for (Player player : getPlayers()) {
+            player.setHasFoundAnswer(false);
             for (Packet packet : item.getPackets()) {
                 player.getConnection().write(packet);
             }
@@ -74,6 +78,19 @@ public class ServerParty extends Party {
         hasStopped = true;
         synchronized (threadLock) {
             threadLock.notify();
+        }
+    }
+
+
+    public void handleAnswer(Player player, String answer) {
+        if(item != null) {
+            if(!player.hasFoundAnswer() && item.getAnswer().equals(answer)) {
+                player.setPoints(player.getPoints() + 10);
+                player.setHasFoundAnswer(true);
+
+                UpdatePlayerPointsPacket updatePlayerPointsPacket = new UpdatePlayerPointsPacket(player);
+                getPlayers().forEach(players -> players.getConnection().writeAndFlush(updatePlayerPointsPacket));
+            }
         }
     }
 }

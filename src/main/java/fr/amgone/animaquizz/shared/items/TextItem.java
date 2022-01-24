@@ -8,6 +8,11 @@ public class TextItem extends Item {
     private final String text;
 
     public TextItem(String text) {
+        this("", text);
+    }
+
+    public TextItem(String answer, String text) {
+        super(answer);
         this.text = text;
     }
 

@@ -17,4 +17,8 @@ public interface PacketListener {
     void handleTextItem(TextItemPacket textItemPacket);
 
     void handleImageItem(ImageItemPacket imageItemPacket);
+
+    void handleAnswerPacket(AnswerPacket answerPacket);
+
+    void handleUpdatePlayerPoints(UpdatePlayerPointsPacket updatePlayerPointsPacket);
 }
