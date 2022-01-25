@@ -3,30 +3,34 @@ package fr.amgone.animaquizz.server;
 import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.items.Item;
-import fr.amgone.animaquizz.shared.packets.Packet;
 import fr.amgone.animaquizz.shared.packets.UpdatePlayerPointsPacket;
 
 public class ServerParty extends Party {
     private boolean hasStopped = false;
-    private final Object threadLock = new Object();
+    private final Object threadLocker = new Object();
 
     private Item item = null;
+    private long nextItemChange = 0;
 
     public ServerParty(String id, String name) {
         super(id, name);
 
         Thread thread = new Thread(() -> {
             while(!hasStopped) {
-                try {
-                    if(getPlayers().size() > 0) {
-                        runThread();
-                    } else {
-                        synchronized (threadLock) {
-                            threadLock.wait();
+                if(getPlayers().size() > 0) {
+                    if(item == null || (System.currentTimeMillis() >= nextItemChange)) {
+                        item = Item.getRandomItem();
+                        item.getPackets().forEach(packet -> getPlayers().forEach(player -> player.getConnection().write(packet)));
+                        getPlayers().forEach(player -> player.getConnection().flush());
+                        nextItemChange = System.currentTimeMillis() + 15 * 1000; // 15 sec
+                        synchronized (threadLocker) {
+                            try {
+                                threadLocker.wait(15000); // We wait for 15000 seconds
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         });
@@ -34,53 +38,26 @@ public class ServerParty extends Party {
         thread.start();
     }
 
-    private void runThread() throws InterruptedException {
-        item = Item.getRandomItem();
-        for (Player player : getPlayers()) {
-            player.setHasFoundAnswer(false);
-            for (Packet packet : item.getPackets()) {
-                player.getConnection().write(packet);
-            }
-            player.getConnection().flush();
-        }
-        synchronized (threadLock) {
-            threadLock.wait(15000);
-        }
-    }
-
-    @Override
-    public boolean addPlayer(Player player) {
-        boolean success = super.addPlayer(player);
-
-        if(success) {
-            synchronized (threadLock) {
-                threadLock.notify();
-            }
-        }
-
-        return success;
-    }
-
     @Override
     public boolean removePlayer(Player player) {
         boolean success = super.removePlayer(player);
 
         if(success) {
-            synchronized (threadLock) {
-                threadLock.notify();
+            hasStopped = true;
+            synchronized (threadLocker) {
+                threadLocker.notify();
             }
         }
 
         return success;
     }
 
-    public void stopThread() {
-        hasStopped = true;
-        synchronized (threadLock) {
-            threadLock.notify();
+    public void sendItemToPlayer(Player player) {
+        if(item != null) {
+            item.getPackets().forEach(packet -> player.getConnection().write(packet));
+            player.getConnection().flush();
         }
     }
-
 
     public void handleAnswer(Player player, String answer) {
         if(item != null) {

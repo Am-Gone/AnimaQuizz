@@ -1,7 +1,6 @@
 package fr.amgone.animaquizz.server;
 
 import fr.amgone.animaquizz.server.handlers.ClientHandler;
-import fr.amgone.animaquizz.shared.Party;
 import fr.amgone.animaquizz.shared.Player;
 import fr.amgone.animaquizz.shared.packets.FetchPartiesPacket;
 import fr.amgone.animaquizz.shared.packets.JoinPartyErrorPacket;
@@ -13,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PartiesManager {
     private final HashMap<String, ServerParty> parties = new HashMap<>();
 
-    public Party createParty(String name) {
+    public ServerParty createParty(String name) {
         ServerParty party = new ServerParty(getRandomID(), name);
         parties.put(party.getId(), party);
 
@@ -21,7 +20,7 @@ public class PartiesManager {
     }
 
     public void addPlayer(Player player, String partyID) {
-        Party party = parties.get(partyID);
+        ServerParty party = parties.get(partyID);
         if(party == null) {
             player.getConnection().writeAndFlush(new JoinPartyErrorPacket(JoinPartyErrorPacket.Errors.PARTY_DOES_NOT_EXISTS));
             return;
@@ -40,7 +39,7 @@ public class PartiesManager {
         if(party.addPlayer(player)) {
             player.setCurrentParty(party);
 
-            player.getConnection().writeAndFlush(new JoinPartyPacket(player.getUsername(), party));
+            player.getConnection().writeAndFlush(new JoinPartyPacket(player.getUsername(), party)).addListener(future -> party.sendItemToPlayer(player));
 
             party.getPlayers().forEach(players -> {
                 if(!players.equals(player)) {
@@ -55,11 +54,10 @@ public class PartiesManager {
         if(player.getCurrentParty() != null) {
             if(player.getCurrentParty().removePlayer(player)) {
                 parties.remove(player.getCurrentParty().getId());
-                ((ServerParty) player.getCurrentParty()).stopThread();
 
                 ClientHandler.getClients().forEach(clients -> {
                     if(clients.getPlayer().getCurrentParty() == null) {
-                        clients.getPlayer().getConnection().writeAndFlush(new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new Party[0])));
+                        clients.getPlayer().getConnection().writeAndFlush(new FetchPartiesPacket(FetchPartiesPacket.Action.RECEIVE, parties.values().toArray(new ServerParty[0])));
                     }
                 });
             }
@@ -79,7 +77,7 @@ public class PartiesManager {
         return id.toString();
     }
 
-    public HashMap<String, Party> getParties() {
+    public HashMap<String, ServerParty> getParties() {
         return new HashMap<>(parties);
     }
 }
