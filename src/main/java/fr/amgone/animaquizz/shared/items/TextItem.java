@@ -7,12 +7,12 @@ import java.util.ArrayList;
 public class TextItem extends Item {
     private final String text;
 
-    public TextItem(String text) {
-        this("", text);
+    public TextItem(String question, String text) {
+        this(question, "", text);
     }
 
-    public TextItem(String answer, String text) {
-        super(answer);
+    public TextItem(String question, String answer, String text) {
+        super(question, answer);
         this.text = text;
     }
 

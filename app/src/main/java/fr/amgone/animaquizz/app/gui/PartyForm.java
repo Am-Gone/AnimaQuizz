@@ -19,6 +19,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -31,10 +32,12 @@ public class PartyForm extends JPanel {
     private final Party party;
     private final Box playersBox;
     private final Box itemBox;
+    private JLabel imageLabel = null;
 
-    private BufferedImage image;
+    private Item item;
     private int lastResizeWidth = 0;
     private int lastResizeHeight = 0;
+    private long secondsLeftBeforeItemChange = 15;
 
     public PartyForm(Client client, Party party) {
         this.party = party;
@@ -54,10 +57,49 @@ public class PartyForm extends JPanel {
         itemBox.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         itemBox.setBackground(Color.GRAY);
         itemBox.setOpaque(true);
+        itemBox.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                if ((lastResizeWidth != itemBox.getWidth() || lastResizeHeight != itemBox.getHeight()) && item != null && item instanceof ImageItem && imageLabel != null) {
+                    lastResizeWidth = itemBox.getWidth();
+                    lastResizeHeight = itemBox.getHeight();
+
+                    Dimension imageDimension = getScaledDimension(((ImageItem) item).getBufferedImage().getWidth(), ((ImageItem) item).getBufferedImage().getHeight(),
+                            new Dimension(itemBox.getWidth(), itemBox.getHeight()));
+                    imageLabel.setIcon(new ImageIcon(resize(((ImageItem) item).getBufferedImage(), (int) imageDimension.getWidth(), (int) imageDimension.getHeight())));
+                    updateUI();
+                }
+            }
+        });
 
         JLabel guess = new JLabel("Devine ça");
         itemBox.add(guess);
         this.add(itemBox, BorderLayout.CENTER);
+
+        new Thread(() -> {
+            while(true) { // TODO
+                secondsLeftBeforeItemChange--;
+                if (secondsLeftBeforeItemChange < 0) {
+                    secondsLeftBeforeItemChange = 0;
+                }
+
+                for (int componentArray = 0; componentArray < itemBox.getComponents().length; componentArray++) {
+                    Component component = itemBox.getComponents()[componentArray];
+                    if (component.getName() != null && component.getName().equals("question")) {
+                        ((JLabel) component).setText(item.getQuestion() + " (" + secondsLeftBeforeItemChange + "s restantes)");
+                        break;
+                    }
+                }
+
+                try {
+                    synchronized (this) {
+                        wait(1000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         ATextField answer = new ATextField(20);
         answer.setPrompt("Écrivez votre réponse");
@@ -115,26 +157,22 @@ public class PartyForm extends JPanel {
     public void setItem(Item item) {
         itemBox.removeAll();
         party.getPlayers().forEach(players -> players.setHasFoundAnswer(false));
+        secondsLeftBeforeItemChange = 15;
+
+        JLabel question = new JLabel("En attente de joueurs...");
+        question.setName("question");
+        itemBox.add(question);
+        if(!(item instanceof ImageItem)) {
+            imageLabel = null;
+        }
+
         if(item instanceof TextItem textItem) {
+            this.item = textItem;
             itemBox.add(new JLabel(textItem.getText()));
         } else if(item instanceof ImageItem imageItem) {
-            image = imageItem.getBufferedImage();
-            JLabel jLabel = new JLabel(new ImageIcon(resize(image, itemBox.getWidth(), itemBox.getHeight())));
-            itemBox.addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentResized(ComponentEvent e) {
-                    if (lastResizeWidth != itemBox.getWidth() || lastResizeHeight != itemBox.getHeight()) {
-                        lastResizeWidth = itemBox.getWidth();
-                        lastResizeHeight = itemBox.getHeight();
-
-                        Dimension imageDimension = getScaledDimension(image.getWidth(), image.getHeight(), new Dimension(itemBox.getWidth(), itemBox.getHeight()));
-                        jLabel.setIcon(new ImageIcon(resize(image, (int) imageDimension.getWidth(), (int) imageDimension.getHeight())));
-                        updateUI();
-                        System.out.println("refreshed " + imageDimension.getWidth() + " " + imageDimension.getHeight());
-                    }
-                }
-            });
-            itemBox.add(jLabel);
+            this.item = imageItem;
+            imageLabel = new JLabel(new ImageIcon(resize(imageItem.getBufferedImage(), itemBox.getWidth(), itemBox.getHeight())));
+            itemBox.add(imageLabel);
         }
 
         reloadPlayers();
@@ -143,7 +181,7 @@ public class PartyForm extends JPanel {
     public static BufferedImage resize(BufferedImage image, int width, int height) {
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TRANSLUCENT);
         Graphics2D g2d = bi.createGraphics();
-        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT));
         g2d.drawImage(image, 0, 0, width, height, null);
         g2d.dispose();
         return bi;

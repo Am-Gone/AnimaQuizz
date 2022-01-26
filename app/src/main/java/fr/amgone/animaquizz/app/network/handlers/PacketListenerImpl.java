@@ -65,7 +65,7 @@ public class PacketListenerImpl implements PacketListener {
     public void handleImageItem(ImageItemPacket imageItemPacket) {
         if(imageFrame.addFrame(imageItemPacket)) {
             BufferedImage bufferedImage = imageFrame.getImage();
-            appWindow.setItem(new ImageItem(bufferedImage));
+            appWindow.setItem(new ImageItem(imageFrame.getQuestion(), bufferedImage));
         }
     }
 

@@ -7,9 +7,11 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Item {
+    private final String question;
     private final String answer;
 
-    protected Item(String answer) {
+    protected Item(String question, String answer) {
+        this.question = question;
         this.answer = answer;
     }
 
@@ -17,12 +19,16 @@ public abstract class Item {
         return answer;
     }
 
+    public String getQuestion() {
+        return question;
+    }
+
     public abstract ArrayList<Packet> getPackets();
 
     public static Item getRandomItem() {
         switch (ThreadLocalRandom.current().nextInt(0, 2)) {
             case 0 -> {
-                return new TextItem("random uuid", UUID.randomUUID().toString());
+                return new TextItem("Quel est ce texte?", "random uuid", UUID.randomUUID().toString());
             }
 
             case 1 -> {
@@ -39,11 +45,11 @@ public abstract class Item {
                         bufferedImage.setRGB(x, y, rgb);
                     }
                 }
-                return new ImageItem("4012", bufferedImage);
+                return new ImageItem("D'où vient cette image?", "4012", bufferedImage);
             }
 
             default -> {
-                return new TextItem("unknown item", "Unknown Item");
+                return new TextItem("Qu'est-ce que c'est?", "unknown item", "Unknown Item");
             }
         }
     }

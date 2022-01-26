@@ -8,12 +8,14 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class ImageFrame {
+    private String question;
     private byte[] hash;
     private int imageSize;
     private byte[] imageBuf;
 
     public boolean addFrame(ImageItemPacket imageItemPacket) {
         if(!Arrays.equals(hash, imageItemPacket.getHash())) {
+            question = imageItemPacket.getQuestion();
             hash = imageItemPacket.getHash();
             imageSize = imageItemPacket.getImageSize();
             imageBuf = new byte[0];
@@ -29,12 +31,17 @@ public class ImageFrame {
         return imageSize == result.length;
     }
 
+    public String getQuestion() {
+        return question;
+    }
+
     public BufferedImage getImage() {
         ByteArrayInputStream imageBufInputStream = new ByteArrayInputStream(imageBuf);
         imageBuf = null;
         BufferedImage bufferedImage = null;
         try {
             bufferedImage = ImageIO.read(imageBufInputStream);
+            imageBufInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

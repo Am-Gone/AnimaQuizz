@@ -15,13 +15,19 @@ public class TextItemPacket extends Packet {
     }
 
     public TextItemPacket(ByteBuf byteBuf) {
+        byte[] questionBytes = new byte[byteBuf.readInt()];
+        byteBuf.readBytes(questionBytes);
+
         byte[] textBytes = new byte[byteBuf.readInt()];
         byteBuf.readBytes(textBytes);
-        this.textItem = new TextItem(new String(textBytes));
+        this.textItem = new TextItem(new String(questionBytes), new String(textBytes));
     }
 
     @Override
     public void write(ByteBuf out) {
+        out.writeInt(textItem.getQuestion().getBytes(StandardCharsets.UTF_8).length);
+        out.writeBytes(textItem.getQuestion().getBytes(StandardCharsets.UTF_8));
+
         out.writeInt(textItem.getText().getBytes(StandardCharsets.UTF_8).length);
         out.writeBytes(textItem.getText().getBytes(StandardCharsets.UTF_8));
     }

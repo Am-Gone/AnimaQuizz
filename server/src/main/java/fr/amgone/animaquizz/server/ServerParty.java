@@ -18,14 +18,25 @@ public class ServerParty extends Party {
         Thread thread = new Thread(() -> {
             while(!hasStopped) {
                 if(getPlayers().size() > 0) {
-                    if(item == null || (System.currentTimeMillis() >= nextItemChange)) {
+                    if(item == null || (System.currentTimeMillis() >= nextItemChange) || getPlayers().stream().allMatch(Player::hasFoundAnswer)) {
                         item = Item.getRandomItem();
                         item.getPackets().forEach(packet -> getPlayers().forEach(player -> player.getConnection().write(packet)));
-                        getPlayers().forEach(player -> player.getConnection().flush());
+                        getPlayers().forEach(player -> {
+                            player.setHasFoundAnswer(false);
+                            player.getConnection().flush();
+                        });
                         nextItemChange = System.currentTimeMillis() + 15 * 1000; // 15 sec
                         synchronized (threadLocker) {
                             try {
                                 threadLocker.wait(15000); // We wait for 15000 seconds
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        synchronized (threadLocker) {
+                            try {
+                                threadLocker.wait(nextItemChange - System.currentTimeMillis()); // We wait until the time is left
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -64,6 +75,10 @@ public class ServerParty extends Party {
             if(!player.hasFoundAnswer() && item.getAnswer().equals(answer)) {
                 player.setPoints(player.getPoints() + 10);
                 player.setHasFoundAnswer(true);
+
+                synchronized (threadLocker) {
+                    threadLocker.notify();
+                }
 
                 UpdatePlayerPointsPacket updatePlayerPointsPacket = new UpdatePlayerPointsPacket(player);
                 getPlayers().forEach(players -> players.getConnection().writeAndFlush(updatePlayerPointsPacket));

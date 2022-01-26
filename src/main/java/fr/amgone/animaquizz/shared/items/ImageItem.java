@@ -16,12 +16,12 @@ public class ImageItem extends Item {
     private static final short MAX_IMAGE_FRAME_SIZE = 15000;
     private final BufferedImage bufferedImage;
 
-    public ImageItem(BufferedImage bufferedImage) {
-        this("", bufferedImage);
+    public ImageItem(String question, BufferedImage bufferedImage) {
+        this(question, "", bufferedImage);
     }
 
-    public ImageItem(String answer, BufferedImage bufferedImage) {
-        super(answer);
+    public ImageItem(String question, String answer, BufferedImage bufferedImage) {
+        super(question, answer);
         this.bufferedImage = bufferedImage;
     }
 
@@ -39,16 +39,18 @@ public class ImageItem extends Item {
         byte[] imageHash = Utils.getHash(imageBuf.array());
         int imageSize = imageBuf.readableBytes();
 
+        boolean hasSetQuestion = false;
         while(imageBuf.readableBytes() > MAX_IMAGE_FRAME_SIZE) {
             byte[] imageFrame = new byte[MAX_IMAGE_FRAME_SIZE];
             imageBuf.readBytes(imageFrame);
 
-            packets.add(new ImageItemPacket(imageHash, imageSize, imageFrame));
+            packets.add(new ImageItemPacket(hasSetQuestion ? null : getQuestion(), imageHash, imageSize, imageFrame));
+            hasSetQuestion = true;
         }
 
         byte[] imageFrame = new byte[imageBuf.readableBytes()];
         imageBuf.readBytes(imageFrame);
-        packets.add(new ImageItemPacket(imageHash, imageSize, imageFrame));
+        packets.add(new ImageItemPacket(hasSetQuestion ? null : getQuestion(), imageHash, imageSize, imageFrame));
 
         return packets;
     }
